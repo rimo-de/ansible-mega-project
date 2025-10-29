@@ -222,3 +222,24 @@ When executing the playbook, the task "[webserver : Deploy Nginx configuration f
 
 Using the shell command `cat /etc/nginx/nginx.conf | head -20`, we verify that the Jinja2 template was properly rendered on both web1 and web2. The output shows the dynamically generated configuration with all variables correctly substituted: `worker_processes 4`, `worker_connections 1024`, and `keepalive_timeout 65`. Both servers display "CHANGED" status with matching configurations, confirming successful deployment and handler execution.
 
+## Working with Handlers
+
+Handlers are specialized tasks that respond to notifications from other tasks. They only execute when a change is detected, making them perfect for operations like service restarts. When a configuration file changes, the task notifies the handler, which then restarts the service. This prevents unnecessary service interruptions and aligns with Ansible's idempotent philosophy.
+
+**Handler Definition and Task Notification:**
+
+![Handler Setup with Notify](img/Ansible22.png)
+
+The screenshot shows the handler `restart nginx service` defined in `handlers/main.yml` that restarts the Nginx service. In `main_template.yml`, the task "Deploy Nginx configuration from template" includes `notify: restart nginx` which tells Ansible to trigger this handler when the configuration file changes. This ensures the Nginx service only restarts when the configuration actually changes, avoiding unnecessary downtime.
+
+**Handler Execution Flow:**
+
+![Handler Notification in Action](img/Ansible23.png)
+
+When the playbook executes, tasks proceed normally until the Nginx configuration task detects changes. The output clearly shows the `notify: restart nginx` directive in the task file, and below that, the playbook execution shows all tasks completing. The Nginx configuration deployment shows changes on both web1 and web2, which triggers the handler notification mechanism.
+
+**Handler Invocation and Service Restart:**
+
+![Running Handler on Configuration Change](img/Ansible24.png)
+
+The execution output demonstrates the handler in action. The role variables show configuration values like `nginx_worker_processes: 16`, `nginx_worker_connections: 1024`, and `nginx_keepalive_timeout: 85`. Crucially, the output shows "RUNNING HANDLER [webserver : restart nginx service]" executing on both web1 and web2, with the status showing "changed: [web1]" and "changed: [web2]". This proves that when the Nginx configuration template was deployed, it triggered the handler to restart the service on all managed hosts.
