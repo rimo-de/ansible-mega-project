@@ -155,3 +155,33 @@ They reduce duplication and ensure consistency across your infrastructure.
 Host variables take precedence over group variables when there's a naming conflict.
 
 In essence: group_vars provide the baseline configuration, while host_vars allow fine-tuning for specific servers. This hierarchical approach keeps your automation both standardized and flexible.
+
+## Templates with Jinja2
+
+Jinja2 is a templating language that allows you to create dynamic configuration files with variables, conditionals, and loops. Templates in Ansible enable you to generate customized files across multiple servers without manually editing each one, making infrastructure provisioning scalable and consistent.
+
+**Role Structure for Templates:**
+
+![Role Directory Structure](img/Ansible14.png)
+
+This screenshot shows the standard Ansible role structure created for the `webserver` role. The role contains subdirectories including `handlers/` (for service restart logic), `tasks/` (main task definitions), `templates/` (Jinja2 template files), and `vars/` (role-specific variables). This organized structure makes roles reusable and self-contained.
+
+**Complete Project Structure with Roles:**
+
+![Project Tree with Role Organization](img/Ansible15.png)
+
+The full project hierarchy shows how the `webserver` role is integrated into the larger project. The role's `tasks/main.yml` contains the core tasks (Install Nginx, Start Nginx service), while the `deploy-with-roles.yml` playbook demonstrates how to call this role. This modular approach allows roles to be reused across different playbooks and even shared across projects.
+
+**Executing Roles from Playbooks:**
+
+![Role Execution Results](img/Ansible16.png)
+
+When executing the `deploy-with-roles.yml` playbook, Ansible seamlessly runs all tasks defined within the `webserver` role on both host groups. The output shows "[webserver : Install Nginx]" and "[webserver : Start Nginx service]" tasks executing successfully on web1 and web2, demonstrating how roles encapsulate related tasks and make playbooks cleaner and more maintainable.
+
+### Why Use Roles?
+
+✅ **Reusability** - Write once, use across multiple playbooks and projects
+✅ **Organization** - Keep related tasks, handlers, templates, and variables together
+✅ **Modularity** - Each role has a single responsibility (e.g., webserver installation)
+✅ **Maintainability** - Easy to update and version control entire components
+✅ **Team Collaboration** - Clear structure helps team members understand and contribute to automation code
