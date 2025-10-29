@@ -178,10 +178,24 @@ The full project hierarchy shows how the `webserver` role is integrated into the
 
 When executing the `deploy-with-roles.yml` playbook, Ansible seamlessly runs all tasks defined within the `webserver` role on both host groups. The output shows "[webserver : Install Nginx]" and "[webserver : Start Nginx service]" tasks executing successfully on web1 and web2, demonstrating how roles encapsulate related tasks and make playbooks cleaner and more maintainable.
 
-### Why Use Roles?
+## Task Inclusion & Organization
 
-✅ **Reusability** - Write once, use across multiple playbooks and projects
-✅ **Organization** - Keep related tasks, handlers, templates, and variables together
-✅ **Modularity** - Each role has a single responsibility (e.g., webserver installation)
-✅ **Maintainability** - Easy to update and version control entire components
-✅ **Team Collaboration** - Clear structure helps team members understand and contribute to automation code
+As your Ansible projects grow, keeping all tasks in a single file becomes difficult to maintain. Task inclusion allows you to break down complex playbooks into smaller, focused task files that can be organized logically and reused across different playbooks. This follows the DRY (Don't Repeat Yourself) principle and makes your automation code more modular and maintainable.
+
+**Organizing Tasks with Jinja2 Templates:**
+
+![Task Inclusion and Template Organization](img/Ansible17.png)
+
+The screenshot demonstrates how tasks are organized within a role. The `index.html.j2` Jinja2 template dynamically generates HTML content with variables like `{{ inventory_hostname }}`, `{{ app_name }}`, and `{{ app_version }}`. The `main.yml` file in the tasks directory uses `include_tasks: main_template.yml` to include task definitions from separate files. The `main_template.yml` contains the "Deploy index.html from template" task that copies the rendered template to the destination, separating template deployment logic from installation and service management tasks.
+
+**Task Separation and Execution:**
+
+![Task Execution Output](img/Ansible17.png)
+
+When the `deploy-with-role-templates.yml` playbook executes, Ansible orchestrates the included tasks in sequence. The output shows multiple task phases: "[webserver : Install Nginx]", "[webserver : Start Nginx service]", "[webserver : Include_tasks]", and "[webserver : Deploy index.html from template]" all executing successfully on both web1 and web2. This demonstrates how separated task files are loaded and executed at runtime while maintaining a logical flow.
+
+**Template Content Verification:**
+
+![Curl Verification of Rendered Templates](img/Ansible18.png)
+
+Using curl commands on both server IPs verifies that the Jinja2 templates were properly rendered with host-specific content. Web1 displays "Welcome to web1" with its corresponding server information, while web2 displays "Welcome to web2" with different server details. This confirms that the dynamic templates were correctly processed and deployed, with each server showing personalized content based on its inventory variables.
