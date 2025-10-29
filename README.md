@@ -124,3 +124,34 @@ to personalize the webpage with server-specific information. This demonstrates h
 
 Running these playbooks successfully installs Nginx on both webservers (web1 and web2) and deploys the custom webpage. The terminal output shows successful curl requests to both servers, 
 displaying the personalized welcome pages with server hostnames and dates. This proves that Ansible has orchestrated the entire deployment across multiple hosts efficiently and consistently.
+
+## Variables (group_vars, host_vars, role vars)
+
+Variables in Ansible allow you to make your playbooks dynamic and reusable. Instead of hardcoding values, you can define variables at different scopes and reference them throughout your automation. 
+This makes your playbooks flexible, maintainable, and adaptable to different environments.
+
+**Group Variables and Host Variables:**
+
+![Variables Organization and Playbook Usage](img/Ansible12.png)
+
+The screenshot shows three types of variable organization. The `group_vars/webservers.yml` file contains variables that apply to all servers in the webservers group (like `nginx_port: 80`, `nginx_user: nginx`, `app_name: MyWebApp`). 
+Meanwhile, `host_vars/web1.yml` and `host_vars/web2.yml` contain host-specific variables that override or supplement group variables (like `app_name: MyWebApp 1` for web1 and `app_name: MyWebApp 2` for web2). 
+The `deploy-with-variables.yml` playbook demonstrates how to load and use these variables through the `vars_files` directive.
+
+**Variable Consumption in Action:**
+
+![Variables Execution Results](img/Ansible13.png)
+
+When the playbook executes, it creates a dynamic HTML page using variables like `{{ app_name }}`, `{{ app_version }}`, and `{{ nginx_port }}`. 
+The curl commands show the results on both servers: web1 displays "MyWebApp 1" while web2 displays "MyWebApp 2", proving that host-specific variables override group variables. 
+This demonstrates how Ansible intelligently merges variables at different scopes to create host-specific configurations from a single playbook.
+
+### Understanding group_vars vs host_vars
+
+**group_vars** - Apply to all hosts in a specific group defined in your inventory. Use these for common configuration that should be shared across multiple servers (like web server port, package names, or service names). 
+They reduce duplication and ensure consistency across your infrastructure.
+
+**host_vars** - Apply to individual hosts only. Use these for host-specific customizations like unique IP addresses, specific application configurations, or server-specific settings that differ from the group defaults. 
+Host variables take precedence over group variables when there's a naming conflict.
+
+In essence: group_vars provide the baseline configuration, while host_vars allow fine-tuning for specific servers. This hierarchical approach keeps your automation both standardized and flexible.
