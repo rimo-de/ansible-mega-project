@@ -88,7 +88,8 @@ The inventory file (`hosts.ini`) defines all the hosts and groups that Ansible w
 
 ![Inventory File - hosts.ini](img/Ansible5.png)
 
-Our `hosts.ini` file contains two EC2 instances organized into the `[webservers]` group. Each host entry specifies the IP address, Python interpreter location, SSH user, and private key path needed for Ansible to connect and execute commands.
+Our `hosts.ini` file contains two EC2 instances organized into the `[webservers]` group. Each host entry specifies the IP address, Python interpreter location, SSH user, and 
+private key path needed for Ansible to connect and execute commands.
 
 **Testing Connectivity:**
 
@@ -97,3 +98,29 @@ Our `hosts.ini` file contains two EC2 instances organized into the `[webservers]
 Using the `ansible all -i inventories/hosts.ini -m ping` command, we verify that both instances are reachable and responsive. 
 The successful "pong" responses from both `web1` and `web2` confirm that Ansible can communicate with all managed hosts. 
 This ping test ensures your inventory configuration is correct before running actual playbooks.
+
+## Playbooks & Roles
+
+Playbooks are the core of Ansible automation. They contain plays that define a set of tasks to execute on target hosts. Roles provide a way to organize playbooks into reusable, 
+modular components for better code organization and maintainability.
+
+**Installing and Configuring Nginx:**
+
+![Install Nginx Playbook](img/Ansible7.png)
+
+The `install-nginx.yml` playbook demonstrates task organization with multiple steps: it ensures Nginx is installed using the package manager, starts the Nginx service, 
+and enables it to run on system boot. Each task targets the webservers group, allowing Ansible to execute these steps on all hosts simultaneously.
+
+**Deploying a Custom Webpage:**
+
+![Deploy Webpage Playbook](img/Ansible8.png)
+
+The `deploy-webpage.yml` playbook shows how to use the `copy` module with dynamic content. It creates a custom `index.html` file using Jinja2 variables like `{{ inventory_hostname }}` 
+to personalize the webpage with server-specific information. This demonstrates how playbooks can generate and deploy configuration files dynamically across all managed servers.
+
+**Execution Results:**
+
+![Playbook Execution and Verification](img/Ansible9.png)
+
+Running these playbooks successfully installs Nginx on both webservers (web1 and web2) and deploys the custom webpage. The terminal output shows successful curl requests to both servers, 
+displaying the personalized welcome pages with server hostnames and dates. This proves that Ansible has orchestrated the entire deployment across multiple hosts efficiently and consistently.
