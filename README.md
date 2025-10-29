@@ -199,3 +199,26 @@ When the `deploy-with-role-templates.yml` playbook executes, Ansible orchestrate
 ![Curl Verification of Rendered Templates](img/Ansible18.png)
 
 Using curl commands on both server IPs verifies that the Jinja2 templates were properly rendered with host-specific content. Web1 displays "Welcome to web1" with its corresponding server information, while web2 displays "Welcome to web2" with different server details. This confirms that the dynamic templates were correctly processed and deployed, with each server showing personalized content based on its inventory variables.
+
+## Handlers for Service Management
+
+Handlers are special tasks in Ansible that only run when notified by another task. They are typically used for actions that should only occur when a change is made, such as restarting a service after updating its configuration file. This ensures efficient resource usage and prevents unnecessary service restarts, following the principle of idempotency.
+
+**Nginx Configuration with Handlers:**
+
+![Nginx Configuration Template and Handler Setup](img/Ansible19.png)
+
+The screenshot shows the `nginx.conf.j2` Jinja2 template that dynamically configures Nginx with variables like `worker_processes`, `worker_connections`, and `keepalive_timeout`. The `main_template.yml` task file contains the "Deploy Nginx configuration from template" task that copies the rendered configuration to `/etc/nginx/nginx.conf`. This task is configured to notify handlers when changes are detected, ensuring the Nginx service only restarts when the configuration actually changes.
+
+**Playbook Execution with Handler Notification:**
+
+![Handler Execution Output](img/Ansible20.png)
+
+When executing the playbook, the task "[webserver : Deploy Nginx configuration from template]" shows "changed: [web1]" and "changed: [web2]", indicating the configuration file was modified. This change triggers the handler notification, causing the Nginx service to restart. The execution log shows all tasks completing successfully, with the configuration deployment task causing the change that prompts the handler to run.
+
+**Configuration Verification:**
+
+![Nginx Configuration Verification](img/Ansible21.png)
+
+Using the shell command `cat /etc/nginx/nginx.conf | head -20`, we verify that the Jinja2 template was properly rendered on both web1 and web2. The output shows the dynamically generated configuration with all variables correctly substituted: `worker_processes 4`, `worker_connections 1024`, and `keepalive_timeout 65`. Both servers display "CHANGED" status with matching configurations, confirming successful deployment and handler execution.
+
