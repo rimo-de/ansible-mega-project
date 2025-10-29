@@ -79,3 +79,21 @@ ansible-mega-project/
 - File naming matches hostnames from inventory
 - Use for host-specific configurations that differ from group settings
 - Example: `host_vars/server1.example.com.yml`
+
+
+## Inventory Management
+The inventory file (`hosts.ini`) defines all the hosts and groups that Ansible will manage. This is the foundation of your Ansible infrastructure, specifying which servers to target and how to connect to them.
+
+**Inventory File Structure:**
+
+![Inventory File - hosts.ini](img/Ansible5.png)
+
+Our `hosts.ini` file contains two EC2 instances organized into the `[webservers]` group. Each host entry specifies the IP address, Python interpreter location, SSH user, and private key path needed for Ansible to connect and execute commands.
+
+**Testing Connectivity:**
+
+![Inventory Connectivity Test with Ping](img/Ansible6.png)
+
+Using the `ansible all -i inventories/hosts.ini -m ping` command, we verify that both instances are reachable and responsive. 
+The successful "pong" responses from both `web1` and `web2` confirm that Ansible can communicate with all managed hosts. 
+This ping test ensures your inventory configuration is correct before running actual playbooks.
